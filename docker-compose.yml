@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: leon_postgres
+    environment:
+      POSTGRES_DB: leondb
+      POSTGRES_USER: leon
+      POSTGRES_PASSWORD: leon666
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: leon_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
