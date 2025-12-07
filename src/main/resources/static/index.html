@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Auth Demo — Sign In / Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container" role="main">
+    <!-- Left promo panel -->
+    <section class="panel promo" aria-labelledby="promo-title">
+        <div class="logo">
+            <div class="mark">LA</div>
+            <div>
+                <h1 id="promo-title">LeonApp — Auth Demo</h1>
+                <div class="lead">Sign up or sign in and test your Spring Boot backend quickly. Client-side validation and friendly UI for testing.</div>
+            </div>
+        </div>
+
+        <div style="margin-top:auto;color:var(--muted);font-size:13px">
+            <div>✔️ Register & Login (no token)</div>
+            <div>✔️ Password hashed on server (BCrypt)</div>
+            <div>✔️ Update API_BASE to your server if needed</div>
+        </div>
+    </section>
+
+    <!-- Right auth form -->
+    <section class="panel auth" aria-labelledby="auth-title">
+        <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <h2 id="auth-title" style="font-size:18px">Welcome back</h2>
+
+                <div class="switcher" role="tablist" aria-label="auth switch">
+                    <div id="tab-signin" class="tab active" role="tab" tabindex="0" aria-selected="true">Sign In</div>
+                    <div id="tab-signup" class="tab" role="tab" tabindex="0" aria-selected="false">Sign Up</div>
+                </div>
+            </div>
+
+            <!-- Alert messages -->
+            <div id="alert" class="alert" role="status" aria-live="polite"></div>
+
+            <!-- Sign In Form -->
+            <form id="form-signin" aria-hidden="false" novalidate>
+                <label for="signin-email">Email</label>
+                <input id="signin-email" name="email" type="email" placeholder="you@mail.com" required />
+
+                <label for="signin-password">Password</label>
+                <input id="signin-password" name="password" type="password" placeholder="Your password" required />
+
+                <div class="meta">
+                    <div class="helper">Don't have an account? Switch to Sign Up</div>
+                    <button id="btn-signin" type="submit" class="primary">Sign In</button>
+                </div>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="form-signup" aria-hidden="true" style="display:none" novalidate>
+                <label for="signup-name">Full name</label>
+                <input id="signup-name" name="name" type="text" placeholder="Elgun Example" required />
+
+                <label for="signup-email">Email</label>
+                <input id="signup-email" name="email" type="email" placeholder="you@mail.com" required />
+
+                <label for="signup-password">Password (min 8 chars)</label>
+                <input id="signup-password" name="password" type="password" placeholder="At least 8 characters" minlength="8" required />
+
+                <div class="meta">
+                    <div class="helper">Already have an account? Switch to Sign In</div>
+                    <button id="btn-signup" type="submit" class="primary">Create account</button>
+                </div>
+            </form>
+
+        </div>
+
+        <!-- Result box -->
+        <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div style="font-size:13px;color:var(--muted)">API Response</div>
+                <div style="font-size:13px;color:var(--muted)">Base URL: <code id="api-base" style="color:#cbd5e1">http://localhost:8080</code></div>
+            </div>
+
+            <div id="result" class="result" aria-live="polite">No requests yet.</div>
+        </div>
+    </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
