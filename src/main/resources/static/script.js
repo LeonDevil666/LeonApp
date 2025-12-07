@@ -1,22 +1,31 @@
-function showLogin() {
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("loginForm").classList.remove("hidden");
+console.log("JS запущен ✅");
+
+// Навигация
+function openLogin() {
+    hideAll();
+    document.getElementById("login").classList.remove("hidden");
 }
 
-function showRegister() {
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("registerForm").classList.remove("hidden");
+function openRegister() {
+    hideAll();
+    document.getElementById("register").classList.remove("hidden");
 }
 
-function back() {
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("registerForm").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
+function goHome() {
+    hideAll();
+    document.getElementById("main").classList.remove("hidden");
 }
 
+function hideAll() {
+    document.getElementById("main").classList.add("hidden");
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("register").classList.add("hidden");
+}
 
 // ✅ LOGIN
 function login() {
+    document.getElementById("loginLoader").classList.remove("hidden");
+
     const data = {
         email: document.getElementById("loginEmail").value,
         password: document.getElementById("loginPassword").value
@@ -29,19 +38,33 @@ function login() {
         },
         body: JSON.stringify(data)
     })
-    .then(res => res.json())
-    .then(result => {
-        alert("Successful login!");
-        console.log(result);
+    .then(async res => {
+        const text = await res.text();
+
+        if (!res.ok) throw new Error(text);
+
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch {
+            result = { message: text };
+        }
+
+        localStorage.setItem("user", JSON.stringify(result));
+        window.location.href = "dashboard.html";
     })
     .catch(err => {
-        alert("Login error");
+        alert("Ошибка входа: " + err.message);
+    })
+    .finally(() => {
+        document.getElementById("loginLoader").classList.add("hidden");
     });
 }
 
-
 // ✅ REGISTER
 function register() {
+    document.getElementById("registerLoader").classList.remove("hidden");
+
     const data = {
         name: document.getElementById("name").value,
         surname: document.getElementById("surname").value,
@@ -58,13 +81,27 @@ function register() {
         },
         body: JSON.stringify(data)
     })
-    .then(res => res.json())
-    .then(result => {
-        alert("Registration successful!");
-        console.log(result);
-        back();
+    .then(async res => {
+        const text = await res.text();
+        if (!res.ok) throw new Error(text);
+
+        alert("User was successfully registered");
+
+        // ✅ ОЧИСТКА ВСЕХ ПОЛЕЙ ПОСЛЕ РЕГИСТРАЦИИ
+        document.getElementById("name").value = "";
+        document.getElementById("surname").value = "";
+        document.getElementById("username").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("phoneNumber").value = "";
+
+        // ✅ ВОЗВРАТ В МЕНЮ
+        goHome();
     })
     .catch(err => {
-        alert("Error, User already exists");
+        alert("Sign Up Error: " + err.message);
+    })
+    .finally(() => {
+        document.getElementById("registerLoader").classList.add("hidden");
     });
 }
