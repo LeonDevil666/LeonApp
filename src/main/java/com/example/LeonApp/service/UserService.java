@@ -20,4 +20,12 @@ public class UserService {
     public void deleteAllPersons() {
         repository.deleteAll();
     }
+
+    public void deleteById(Integer id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
+
+        repository.deleteById(id);
+    }
 }
