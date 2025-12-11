@@ -87,3 +87,10 @@ p {
         transform: rotate(360deg);
     }
 }
+
+#verify p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+

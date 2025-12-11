@@ -1,5 +1,6 @@
 package com.example.LeonApp.entity;
 
+import com.example.LeonApp.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -31,5 +32,7 @@ public class User {
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
+    @Column(name = "status")
+    private UserStatus status;
 
 }

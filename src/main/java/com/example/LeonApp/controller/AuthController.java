@@ -3,10 +3,10 @@ package com.example.LeonApp.controller;
 import com.example.LeonApp.dto.request.LoginRequestDTO;
 import com.example.LeonApp.dto.request.RegisterRequestDTO;
 import com.example.LeonApp.dto.response.UserResponseDTO;
-import com.example.LeonApp.entity.User;
 import com.example.LeonApp.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,8 +23,14 @@ public class AuthController {
     }
 
     @PostMapping(value = "/register")
-    public UserResponseDTO register
+    public ResponseEntity<?> register
             (@Valid @RequestBody RegisterRequestDTO dto) {
-        return service.register(dto);
+        return ResponseEntity.ok(service.register(dto));
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(@RequestParam String code) {
+        service.verify(code);
+        return ResponseEntity.ok("Verified");
     }
 }

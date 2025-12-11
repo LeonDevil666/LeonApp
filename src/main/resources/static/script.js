@@ -1,6 +1,7 @@
 console.log("JS запущен ✅");
 
-// Навигация
+// ==================== Навигация ====================
+
 function openLogin() {
     hideAll();
     document.getElementById("login").classList.remove("hidden");
@@ -9,6 +10,11 @@ function openLogin() {
 function openRegister() {
     hideAll();
     document.getElementById("register").classList.remove("hidden");
+}
+
+function openVerify() {
+    hideAll();
+    document.getElementById("verify").classList.remove("hidden");
 }
 
 function goHome() {
@@ -20,88 +26,125 @@ function hideAll() {
     document.getElementById("main").classList.add("hidden");
     document.getElementById("login").classList.add("hidden");
     document.getElementById("register").classList.add("hidden");
+    document.getElementById("verify").classList.add("hidden");
 }
 
-// ✅ LOGIN
+// ==================== LOGIN ====================
+
 function login() {
     document.getElementById("loginLoader").classList.remove("hidden");
 
-    const data = {
-        email: document.getElementById("loginEmail").value,
-        password: document.getElementById("loginPassword").value
-    };
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const data = { email, password };
 
     fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
     })
-    .then(async res => {
-        const text = await res.text();
+        .then(async res => {
+            const text = await res.text();
 
-        if (!res.ok) throw new Error(text);
+            // ❌ Если email не подтвержден
+            if (text.includes("EMAIL_NOT_VERIFIED")) {
+                window.currentVerifyEmail = email; // сохраняем email
+                openVerify();
+                alert("Please verify your email first.");
+                throw new Error("Email not verified");
+            }
 
-        let result;
-        try {
-            result = JSON.parse(text);
-        } catch {
-            result = { message: text };
-        }
+            if (!res.ok) throw new Error(text);
 
-        localStorage.setItem("user", JSON.stringify(result));
-        window.location.href = "dashboard.html";
-    })
-    .catch(err => {
-        alert("Ошибка входа: " + err.message);
-    })
-    .finally(() => {
-        document.getElementById("loginLoader").classList.add("hidden");
-    });
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch {
+                result = { message: text };
+            }
+
+            localStorage.setItem("user", JSON.stringify(result));
+            window.location.href = "dashboard.html";
+        })
+        .catch(err => {
+            if (!err.message.includes("Email not verified")) {
+                alert("Ошибка входа: " + err.message);
+            }
+        })
+        .finally(() => {
+            document.getElementById("loginLoader").classList.add("hidden");
+        });
 }
 
-// ✅ REGISTER
+// ==================== REGISTER (открывает Verify) ====================
+
 function register() {
     document.getElementById("registerLoader").classList.remove("hidden");
+
+    const email = document.getElementById("email").value;
 
     const data = {
         name: document.getElementById("name").value,
         surname: document.getElementById("surname").value,
         username: document.getElementById("username").value,
-        email: document.getElementById("email").value,
+        email: email,
         password: document.getElementById("password").value,
         phoneNumber: document.getElementById("phoneNumber").value
     };
 
     fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
     })
-    .then(async res => {
-        const text = await res.text();
-        if (!res.ok) throw new Error(text);
+        .then(async res => {
+            const text = await res.text();
+            if (!res.ok) throw new Error(text);
 
-        alert("User was successfully registered");
+            alert("Verification code sent to your email");
 
-        // ✅ ОЧИСТКА ВСЕХ ПОЛЕЙ ПОСЛЕ РЕГИСТРАЦИИ
-        document.getElementById("name").value = "";
-        document.getElementById("surname").value = "";
-        document.getElementById("username").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("password").value = "";
-        document.getElementById("phoneNumber").value = "";
+            // сохраняем email для verify()
+            window.currentVerifyEmail = email;
 
-        // ✅ ВОЗВРАТ В МЕНЮ
-        goHome();
+            openVerify();
+        })
+        .catch(err => {
+            alert("Registration error: " + err.message);
+        })
+        .finally(() => {
+            document.getElementById("registerLoader").classList.add("hidden");
+        });
+}
+
+// ==================== VERIFY CODE ====================
+
+function verifyCode() {
+    const code = document.getElementById("verifyCode").value;
+    const email = window.currentVerifyEmail;
+
+    if (!email) {
+        alert("Email not found. Try registration or login again.");
+        return;
+    }
+
+    const params = new URLSearchParams();
+    params.append("email", email);
+    params.append("code", code);
+
+    fetch("http://localhost:8080/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
     })
-    .catch(err => {
-        alert("Sign Up Error: " + err.message);
-    })
-    .finally(() => {
-        document.getElementById("registerLoader").classList.add("hidden");
-    });
+        .then(async res => {
+            const text = await res.text();
+            if (!res.ok) throw new Error(text);
+
+            alert("Email verified successfully!");
+            goHome();
+        })
+        .catch(err => {
+            alert("Verification error: " + err.message);
+        });
 }
